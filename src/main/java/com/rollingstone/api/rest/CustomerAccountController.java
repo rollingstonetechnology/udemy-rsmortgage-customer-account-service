@@ -39,7 +39,7 @@ public class CustomerAccountController extends AbstractRestController {
             produces = {"application/json", "application/xml"})
     @ResponseStatus(HttpStatus.CREATED)
     public void createCustomerAccount(@RequestBody Account account,
-                                 HttpServletRequest request, HttpServletResponse response) {
+                                 HttpServletRequest request, HttpServletResponse response) throws Exception {
     	Account createdAccount = this.customerAccountService.createAccount(account);
         response.setHeader("Location", request.getRequestURL().append("/").append(createdAccount.getId()).toString());
     }
@@ -108,7 +108,7 @@ public class CustomerAccountController extends AbstractRestController {
             produces = {"application/json", "application/xml"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateCustomerAccount(@PathVariable("id") Long id, @RequestBody Account account,
-                                 HttpServletRequest request, HttpServletResponse response) {
+                                 HttpServletRequest request, HttpServletResponse response) throws Exception {
         checkResourceFound(this.customerAccountService.getAccount(id));
         if (id != account.getId()) throw new HTTP400Exception("ID doesn't match!");
         this.customerAccountService.updateAccount(account);

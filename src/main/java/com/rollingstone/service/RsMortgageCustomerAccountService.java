@@ -33,20 +33,68 @@ public class RsMortgageCustomerAccountService {
 
     @Autowired
     GaugeService gaugeService;
+    
+    @Autowired
+  	private CustomerClient customerClient;
 
     public RsMortgageCustomerAccountService() {
     }
 
-    public Account createAccount(Account account) {
-        return customerAccountRepository.save(account);
+    public Account createAccount(Account account) throws Exception {
+    	Account createdAccount = null;
+    	if (account != null && account.getCustomer() != null){
+    		
+    		log.info("In service account create"+ account.getCustomer().getId());
+    		if (customerClient == null){
+        		log.info("In customerClient null got customer");
+    		}
+    		else {
+    			log.info("In customerClient not null got customer");
+    		}
+    		
+    		Customer customer = customerClient.getCustomer((new Long(account.getCustomer().getId())));
+    		
+    		if (customer != null){
+    			createdAccount  = customerAccountRepository.save(account);
+    		}else {
+    			log.info("Invalid Customer");
+    			throw new Exception("Invalid Customer");
+    		}
+    	}
+    	else {
+    			throw new Exception("Invalid Customer");
+    	}
+        return createdAccount;
     }
 
     public Account getAccount(long id) {
         return customerAccountRepository.findOne(id);
     }
 
-    public void updateAccount(Account account) {
-    	customerAccountRepository.save(account);
+    public void updateAccount(Account account) throws Exception {
+    	Account createdAccount = null;
+    	if (account != null && account.getCustomer() != null){
+    		
+    		log.info("In service account create"+ account.getCustomer().getId());
+    		if (customerClient == null){
+        		log.info("In customerClient null got customer");
+    		}
+    		else {
+    			log.info("In customerClient not null got customer");
+    		}
+    		
+    		Customer customer = customerClient.getCustomer((new Long(account.getCustomer().getId())));
+    		
+    		if (customer != null){
+    			createdAccount  = customerAccountRepository.save(account);
+    		}else {
+    			log.info("Invalid Customer");
+    			throw new Exception("Invalid Customer");
+    		}
+    	}
+    	else {
+    			throw new Exception("Invalid Customer");
+    	}
     }
 
     public void deleteAccount(Long id) {
