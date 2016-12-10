@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.rollingstone.dao.jpa.RsMortgageCustomerAccountRepository;
 import com.rollingstone.domain.Account;
 import com.rollingstone.domain.Customer;
@@ -40,6 +41,7 @@ public class RsMortgageCustomerAccountService {
     public RsMortgageCustomerAccountService() {
     }
 
+    @HystrixCommand(fallbackMethod = "createAccountWithoutCustomerValidation")
     public Account createAccount(Account account) throws Exception {
     	Account createdAccount = null;
     	if (account != null && account.getCustomer() != null){
@@ -56,6 +58,7 @@ public class RsMortgageCustomerAccountService {
     		
     		if (customer != null){
     			createdAccount  = customerAccountRepository.save(account);
+    			log.info("Valid Customer Created Account.");
     		}else {
     			log.info("Invalid Customer");
     			throw new Exception("Invalid Customer");
@@ -64,6 +67,16 @@ public class RsMortgageCustomerAccountService {
     	else {
     			throw new Exception("Invalid Customer");
     	}
+        return createdAccount;
+    }
+    
+    public Account createAccountWithoutCustomerValidation(Account account) throws Exception {
+    	Account createdAccount = null;
+    
+    	log.info("Customer Validation Failed. Creating Customer Account without validation.");
+    	
+    	createdAccount  = customerAccountRepository.save(account);
+    	
         return createdAccount;
     }
 
