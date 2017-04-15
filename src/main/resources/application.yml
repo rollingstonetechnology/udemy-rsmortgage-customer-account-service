@@ -2,20 +2,30 @@
 ### This fils is in Yaml format but you can also do this using the traditional
 ### Java properties file.
 
+
+
+spring:
+  profiles:
+    active:
+      mysql
+  cloud:
+    config:
+      uri: http://localhost:9000
 server:
-  port: 9009
+  port: 9003
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://eureka-host1:8761/eureka/,http://eureka-host2:8762/eureka/
+    fetchRegistry: true
       
 spring.jmx:
    enabled: false
 
 spring.datasource:
-    driverClassName: org.h2.Driver
-    url: jdbc:h2:mem:bootexample;MODE=MySQL
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost/rsmortgage;MODE=MySQL
 
 
 #todo: make sure to always enable security in production
@@ -25,15 +35,15 @@ security:
 
 #management endpoints on a separate port
 management:
-  port: 9010
+  port: 9004
   security:
     enabled: false # management port is internal only. no need to secure it.
 
 #default project info followed by actual injected pom-specified values.
 project:
-  name: spring-boot-rest-example
+  name: udemy-rsmortgage-customer-account-service
   version: 0.1
-  description: boot-example default description
+  description: udemy-rsmortgage-customer-account-service
 info:
   build:
     artifact: ${project.artifactId}
@@ -41,32 +51,3 @@ info:
     description: ${project.description}
     version: ${project.version}
 
-user.service:
-  name: 'default profile:'
----
-spring:
-  profiles: test
-
-spring.jpa:
-    hibernate.ddl-auto: create-drop
-
-user.service:
-  name: 'test profile:'
----
-spring:
-  profiles: mysql
-
-  datasource:
-    driverClassName: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost/rsmortgage
-    username: root
-    password: root
-
-  jpa:
-    hibernate:
-      dialect: org.hibernate.dialect.MySQLInnoDBDialect
-      ddl-auto: update # todo: in non-dev environments, comment this out:
-
-
-user.service:
-  name: 'test profile:'

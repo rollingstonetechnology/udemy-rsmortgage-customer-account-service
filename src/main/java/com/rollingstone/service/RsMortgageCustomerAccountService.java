@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import com.rollingstone.dao.jpa.RsMortgageCustomerAccountRepository;
 import com.rollingstone.domain.Account;
 import com.rollingstone.domain.Customer;
@@ -20,6 +21,9 @@ import com.rollingstone.domain.Customer;
 
 /*
  * Service class to do CRUD for Customer Account through JPS Repository
+ * 
+ * https://github.com/springfox/springfox/issues/1074
+ * http://stackoverflow.com/questions/27375557/hystrix-command-fails-with-timed-out-and-no-fallback-available/33962251   
  */
 @Service
 public class RsMortgageCustomerAccountService {
@@ -42,6 +46,7 @@ public class RsMortgageCustomerAccountService {
     }
 
     @HystrixCommand(fallbackMethod = "createAccountWithoutCustomerValidation")
+    @HystrixProperty(name = "hystrix.command.default.execution.timeout.enabled", value = "false")
     public Account createAccount(Account account) throws Exception {
     	Account createdAccount = null;
     	if (account != null && account.getCustomer() != null){
@@ -84,6 +89,8 @@ public class RsMortgageCustomerAccountService {
         return customerAccountRepository.findOne(id);
     }
 
+    @HystrixCommand(fallbackMethod = "updateAccountWithoutValidation")
+    @HystrixProperty(name = "hystrix.command.default.execution.timeout.enabled", value = "false")
     public void updateAccount(Account account) throws Exception {
     	Account createdAccount = null;
     	if (account != null && account.getCustomer() != null){
@@ -104,6 +111,24 @@ public class RsMortgageCustomerAccountService {
     			log.info("Invalid Customer");
     			throw new Exception("Invalid Customer");
     		}
+    	}
+    	else {
+    			throw new Exception("Invalid Customer");
+    	}
+    }
+    
+    public void updateAccountWithoutValidation(Account account) throws Exception {
+    	Account createdAccount = null;
+    	if (account != null && account.getCustomer() != null){
+    		
+    		log.info("In service account create"+ account.getCustomer().getId());
+    		if (customerClient == null){
+        		log.info("In customerClient null got customer");
+    		}
+    		else {
+    			log.info("In customerClient not null got customer");
+    		}
+   			createdAccount  = customerAccountRepository.save(account);
     	}
     	else {
     			throw new Exception("Invalid Customer");
