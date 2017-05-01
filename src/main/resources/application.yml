@@ -2,8 +2,6 @@
 ### This fils is in Yaml format but you can also do this using the traditional
 ### Java properties file.
 
-
-
 spring:
   profiles:
     active:
